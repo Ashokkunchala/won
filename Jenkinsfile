@@ -9,14 +9,11 @@ pipeline {
         IMAGE_TAG = 'v1.0-${BUILD_NUMBER}'
     }
     stages {
-        stage('Git Checkout') {
-            steps {
+        steps('Git Checkout') {
                 git branch: 'main', url: 'https://github.com/Ashokkunchala/won.git'
                 echo 'Git checkout is done.'
             }
         }
-    }
-    stages {
         steps('Build Docker Image') {
                 script {
                     // Build the Docker image
@@ -24,7 +21,6 @@ pipeline {
                     echo 'Docker image built successfully.'
                 }
             }
-        }
         steps('Push to ECR') {
                 script {
                     // Authenticate with ECR
