@@ -14,25 +14,29 @@ pipeline {
                 echo 'Git checkout is done.'
             }
         }
+    }
+    stages {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${ECR_REPOSITORY}:${IMAGE_TAG}")
-                }
-            }
-        }
-        stage('Login to ECR') {
-            steps {
-                script {
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                    // Build the Docker image
+                    sh "docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} ."
+                    echo 'Docker image built successfully.'
                 }
             }
         }
         stage('Push to ECR') {
             steps {
                 script {
+                    // Authenticate with ECR
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                    
+                    // Tag the image with the ECR repository URI
                     sh "docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} <aws_account_id>.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+                    
+                    // Push the image to ECR
                     sh "docker push <aws_account_id>.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+                    echo 'Docker image pushed to ECR successfully.'
                 }
             }
         }
