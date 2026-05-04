@@ -28,6 +28,24 @@ pipeline {
             }
         }
 
+        Stage('Image Scan with trivy') {
+            steps {
+                sh '''
+                    trivy image --exit-code 0 --severity HIGH,CRITICAL "${ECR_REPOSITORY}:${IMAGE_TAG}"
+                '''
+                echo 'Docker image scanned successfully.'
+            }
+        }
+        stage('Authenticate with ECR') {
+            steps {
+                sh '''
+                    aws ecr get-login-password --region "${AWS_REGION}" \
+                        | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                '''
+                echo 'Authenticated with ECR successfully.'
+            }
+        }
+
         stage('Push to ECR') {
             steps {
                 sh '''
