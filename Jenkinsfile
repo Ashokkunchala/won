@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                checkout scm
+                git branch: env.BRANCH_NAME ?: 'main', credentialsId: 'Git-cred', url: 'https://github.com/Ashokkunchala/won.git'
                 echo 'Git checkout is done.'
             }
         }
