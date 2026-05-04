@@ -30,7 +30,7 @@ pipeline {
         
         stage('Image Scan with trivy') {
             steps {
-                sh '''++
+                sh '''
                     trivy image --exit-code 0 --severity HIGH,CRITICAL "${ECR_REPOSITORY}:${IMAGE_TAG}"
                 '''
                 echo 'Docker image scanned successfully.'
